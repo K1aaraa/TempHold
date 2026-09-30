@@ -20,11 +20,11 @@ function section() {
   element.innerHTML = "<div class='story-panel'></div>".repeat(4);
   return element;
 }
-test("desktop story uses scoped pinning, viewport-based scroll length, and cleanup", async () => {
+test("desktop story scrubs opacity with native sticky positioning and scoped cleanup", async () => {
   const element = section(); const cleanup = await mountStoryMotion(element);
   expect(element).toHaveClass("is-animated");
-  const options = mocks.timelineFactory.mock.calls[0]![0] as unknown as { scrollTrigger: { pin: boolean; scrub: number; end: () => string } };
-  expect(options.scrollTrigger.pin).toBe(true);
+  const options = mocks.timelineFactory.mock.calls[0]![0] as unknown as { scrollTrigger: { pin?: boolean; scrub: number; end: () => string } };
+  expect(options.scrollTrigger.pin).toBeUndefined();
   expect(options.scrollTrigger.scrub).toBe(0.7);
   expect(options.scrollTrigger.end()).toBe(`+=${Math.max(window.innerHeight, 650) * 3}`);
   expect(mocks.to).toHaveBeenCalledTimes(7);

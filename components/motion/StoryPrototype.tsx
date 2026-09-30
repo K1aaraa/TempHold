@@ -28,11 +28,11 @@ export function StoryPrototype() {
     synchronize(); query.addEventListener("change", synchronize);
     return () => { disposed = true; generation++; query.removeEventListener("change", synchronize); cleanup?.(); };
   }, []);
-  return <section id="cultura" ref={root} className="story" aria-labelledby="story-heading">
+  return <div className="story-track"><section id="cultura" ref={root} className="story" aria-labelledby="story-heading">
     <div className="section-meta"><span>THE THINKING BEHIND THE WORK</span><span>01 — 04</span></div>
     <h2 id="story-heading" className="story-heading">Good marketing moves people.</h2>
     <div className="sr-only">{story.map(item => <div key={item.word}><h3 lang={item.word === "CONEXIÓN" ? "es" : undefined}>{item.word}</h3><p>{item.label}. {item.copy}</p></div>)}</div>
     <div className="story-stage" aria-hidden="true">{story.map(item => <article className="story-panel" key={item.word}><p className="story-label">{item.label}</p><h3 lang={item.word === "CONEXIÓN" ? "es" : undefined}>{item.word}</h3><p className="story-copy">{item.copy}</p></article>)}</div>
     <p className="story-footnote">Different perspectives. Shared connection. <span aria-hidden="true">✳</span></p>
-  </section>;
+  </section></div>;
 }

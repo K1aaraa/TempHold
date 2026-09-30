@@ -1,42 +1,100 @@
 # Kiara — Marketing con sazón
 
-Personal portfolio for a multicultural marketing and community strategist. **Milestone 1: brand and motion prototype.** This intentionally does not contain fabricated projects, testimonials, metrics, portrait photography, or contact details.
+Personal portfolio for a first-gen Mexican-American multicultural marketing and community strategist. Editorial storytelling, clear strategic positioning, real project evidence, and restrained motion.
 
-## Stack and setup
-Node.js 22+ (tested with 24), Next.js App Router, React, TypeScript, CSS design tokens, GSAP + ScrollTrigger, ESLint.
+Source of truth: [K1aaraa/TempHold](https://github.com/K1aaraa/TempHold). The expertise and case-study foundation is implemented. A real case study and approved personal photography are still needed; no project metrics, testimonials or portraits are invented.
+
+## Stack and development
+
+Node.js **24.x**, Next.js App Router, React, TypeScript, CSS tokens, GSAP/ScrollTrigger, Vitest, React Testing Library, Playwright and Lighthouse.
 
 ```sh
 npm ci
 npm run dev
 ```
-Visit http://localhost:3000. Validate using `npm run lint`, `npm run typecheck`, and `npm run build`; production runs with `npm start`.
 
-## Structure
-- `app/`: server-rendered page, root metadata, global styles, 404.
-- `components/layout/`: semantic navigation.
-- `components/hero/`: editorial positioning.
-- `components/motion/`: isolated client-side GSAP prototype.
-- `data/site.ts`: site identity, contact fields, story sequence.
+Local development: http://localhost:3000. `.env.example` documents the optional canonical-domain value; this prototype needs no secrets. Keep credentials out of Git.
 
-## Design and motion architecture
-Colors, spacing, and fonts live in `app/globals.css` as reusable tokens. The prototype uses Playfair Display and DM Sans with resilient system fallbacks. Google Fonts is currently loaded through CSS; production should self-host licensed WOFF2 files and preload only critical font weights.
+## Validate before review
 
-`StoryPrototype` dynamically imports GSAP only for desktop visitors who allow motion. GSAP matchMedia scopes animations and ScrollTriggers; cleanup reverts pinning and inline styles on unmount and preference/breakpoint changes. Native scrolling is preserved. The desktop story is pinned and scrubbed; mobile and reduced motion present all four panels sequentially. Server-rendered content remains readable if JavaScript fails. No smooth-scroll library or custom cursor is introduced.
+```sh
+npm ci
+npm run lint
+npm run typecheck
+npm run test
+npm run test:coverage
+npm run audit
+npm run build
+npx playwright install --with-deps chromium firefox webkit
+npm run test:e2e
+npm run perf
+```
 
-## Content management and next milestones
-Edit positioning and verified contact URLs in `data/site.ts`; edit hero presentation in `components/hero/Hero.tsx`. Contact links remain absent until verified values exist. A portrait must be supplied by Kiara, with descriptive alt text and approved usage.
+`npm run validate` runs lint, types, coverage tests, audit and production build. `npm run test:watch` is the local test watch mode. `npm run test` exits once; it is not an indefinite watcher. Browser tests and Lighthouse require a successful production build and run `next start`, never `next dev`. They refuse to reuse an unrelated local server.
 
-Milestone 2 adds typed `data/projects.ts`, reusable project cards, `/work/[slug]` case studies, About and Expertise. Each project should provide slug, title, organization, year, role, categories, challenge, context, strategy, contribution, outcomes, verified metrics, reflection, and media. Generate per-project metadata and statically generate known slugs. Do not add invented outcomes. Use `next/image` with accurate sizes, explicit dimensions, and below-the-fold lazy loading when adding assets under `public/projects/`.
+## CI and merge discipline
 
-Milestone 3 adds receipts, personality, verified contact, SEO sitemap/robots/canonical/Open Graph imagery, analytics adapter and performance refinements. Analytics platform is undecided; keep events behind a typed adapter rather than coupling visual components to a vendor.
+[OpenSourceLeg’s CI](https://github.com/opensourceleg/opensourceleg.github.io/blob/main/.github/workflows/ci.yml) informed the install → lint → types → coverage → audit → production build sequence. Deployment here uses Vercel rather than GitHub Pages.
 
-## Environment
-`.env.example` documents the optional `NEXT_PUBLIC_SITE_URL`, to be set once the canonical domain is known. This milestone needs no environment variables or secrets. Prototype metadata is deliberately noindex; remove that restriction only for the approved production release.
+`.github/workflows/ci.yml` runs on every pull request targeting `main`, every push to `main`, and manual dispatch. It uses a clean `npm ci`, warnings-as-errors ESLint, TypeScript, enforced Vitest coverage, a full dependency audit, and the production build. Passing builds are then tested in Chromium, Firefox, WebKit, iPhone/Android viewports and tablet emulation. Lighthouse runs against that same build. Coverage, browser traces/screenshots/videos and Lighthouse HTML/JSON are retained as GitHub Actions artifacts.
 
-## GitHub and Vercel
-Source of truth: https://github.com/K1aaraa/TempHold. Use feature branches, readable commits, draft PRs, review, then merge to main.
+The stable **Merge gate** check fails if validation, any browser project, or Lighthouse fails, is canceled, or is skipped. PRs remain drafts while checks or review are outstanding. The PR template and [release review checklist](docs/release-review.md) require a preview URL, exact SHA, reviewer, test evidence and manual device review. Any failure blocks readiness; do not override a check merely to merge.
 
-In Vercel, import **K1aaraa/TempHold**, select Next.js, root directory `.`, build `npm run build`, install `npm ci`, and production branch `main`. Vercel generates a preview for the feature branch/PR after the GitHub integration is connected. Review the preview before merging. No separate repository is needed. Deployment credentials are never committed.
+**Owner setup required:** In GitHub Settings → Rules → Rulesets (or branch protection), target `main`, require a PR and review, require branches up to date, and require the emitted `Merge gate` status check after its first run. Limit bypasses and apply protection to admins where appropriate. A workflow file alone cannot prevent the owner from merging; this integration cannot administer branch protection. Confirm the rule in GitHub before treating it as enforced.
 
-## Milestone review and QA
-Review positioning, typography, colors, desktop scroll pace, mobile layout and reduced-motion reading order before building the remaining portfolio. Validate desktop Chrome/Safari/Firefox, iOS Safari, Android Chrome, tablet, keyboard focus and skip link, preference changes, refresh at scroll positions, JavaScript disabled, slow network, font fallback, 404, and Lighthouse. Automated checks do not substitute for real-device motion review. Full production SEO, analytics and browser matrix remain later-milestone work.
+## Test coverage and boundaries
+
+Vitest + React Testing Library use jsdom and test semantics, real content rendering, link destinations/activation, key sections, optional media/metrics, project routes/metadata, publication rules, theme contrast, and motion lifecycle. Minimum coverage: **85% statements/lines/functions and 80% branches**, including components, project utilities, page modules and the motion loader—not just imported happy paths. HTML and LCOV reports are saved under `coverage/`. Tests fail if component code emits console errors or warnings.
+
+Next Image and Next Link are mocked only for their unit-level DOM contracts; actual optimization/routing is exercised by Playwright. GSAP unit tests verify loading, cancellation, media preferences, scope/cleanup and timeline configuration using mocks; they do not judge animation quality. Synthetic fixtures stay under `tests/` and never enter portfolio data.
+
+Playwright detects unexpected browser console warnings/errors, internal anchor regressions, overflow, reduced-motion/JS-free reading, fast scroll, reload, viewport/orientation sizes, slow resource loading, missing routes and browser history. Real case-study history tests become active when a published project exists. Until then, that scenario is explicitly skipped, not falsely passed. Browser emulation does not substitute for real Safari, iPhone or Android QA.
+
+## Vercel and preview review
+
+Connect/import **K1aaraa/TempHold** in Vercel using its GitHub integration. Choose Next.js, root `.`, Node 24.x, production branch `main`. `vercel.json` configures `npm ci` and `npm run vercel-build`; this command runs lint, types, coverage tests, audit and `npm run build` before Vercel can complete a build. Keep the configuration override consistent with the committed file.
+
+Git pushes then create preview deployments and GitHub preview checks; merging to `main` creates the production deployment. Vercel’s Git integration ordinarily builds previews in parallel with GitHub CI. Treat previews as review environments and require green CI before merge. For a strict production hold until browser/Lighthouse CI succeeds, configure Vercel Deployment Checks to require the emitted `Merge gate` check where the account supports it. The inline Vercel build gate also prevents a lint/type/test/audit/build failure from being deployed.
+
+After Vercel reports a successful preview, copy its actual URL into the PR and run:
+
+```sh
+PREVIEW_URL=https://your-actual-preview.vercel.app npm run test:e2e
+PREVIEW_URL=https://your-actual-preview.vercel.app npm run perf
+```
+
+These commands test the deployed site instead of starting a local server. If deployment protection blocks automated access, use an approved protected-preview testing setup; do not disable protection or commit bypass tokens. Check the preview manually across the [required matrix](docs/release-review.md) before approval. No integration, URL or deployment is considered verified just because these instructions exist.
+
+## Performance and assets
+
+`next/font` downloads and self-hosts DM Sans/Playfair Display at build time, preloads critical subsets, uses swap and fallback metrics, and removes runtime Google Fonts CSS requests. Font fetch failures must be fixed in CI rather than hidden. CSS tokens live in `app/globals.css`.
+
+GSAP/ScrollTrigger load only for desktop visitors who allow motion. Native CSS sticky handles pinned positioning; GSAP scrubs opacity crossfades without scroll-event position/transform writes, avoiding Firefox asynchronous-panning warnings. The loader cancels obsolete requests, reverts scoped text animation and native sticky layout on preference/breakpoint changes/unmount, and leaves all content in normal flow if loading fails. No smooth-scroll library, custom cursor or 3D bundle is added. Screen readers receive a full static narrative.
+
+Use `next/image` with accurate dimensions, `sizes`, alt text and context captions. Hero imagery is prioritized; artifacts are lazy-loaded. Compress approved photos to modern formats at useful resolutions, avoid upscaling/oversized originals, and inspect the resulting network payload. No videos exist yet; if added, use a poster, restrained resolution/bitrate, no unnecessary autoplay download, and lazy loading. Inspect production bundle/network reports for unused client code and large assets before launch.
+
+Lighthouse reports all four categories and LCP/CLS on mobile by default. CI budgets: Performance ≥80, Accessibility =100, Best Practices ≥90, CLS ≤0.1; aim higher where practical. SEO is reported without a prototype threshold because noindex is intentional. At launch, set `LAUNCH_AUDIT=1` and `LIGHTHOUSE_PATHS=/,/work/real-project` to enforce SEO ≥95 on launch URLs after setting canonical/robots/metadata. Set `LIGHTHOUSE_DESKTOP=1` for a desktop run. Review a mobile LCP target ≤2.5s; instrument actual Core Web Vitals after analytics is selected. Lab scores cannot certify field INP or every device.
+
+## Structure and content
+
+- `app/`: homepage, root metadata/fonts, case-study route, 404 and explicit template preview.
+- `components/`: reusable layout, hero, about, expertise, work and motion UI.
+- `data/`: personal copy, expertise, site information, typed projects and project palettes.
+- `lib/`: published-project validation and isolated GSAP loader.
+- `content/`: editable project scaffold and first-project brief.
+- `tests/`, `e2e/`: unit/component/route and production-browser tests.
+- `scripts/`: Lighthouse runner.
+- `.github/`: CI workflow and PR review template.
+
+### Add a case study
+
+1. Complete `content/first-case-study-brief.md` with actual role, audience, problem, insight, decisions, outcomes and learning.
+2. Copy `content/project-template.ts` into `data/projects.ts`; replace all prompts. Keep `status: "draft"` until facts and media are reviewed. Drafts are neither listed nor served at `/work/[slug]`.
+3. Choose a `theme` from `data/themes.ts` (paper, ink, plum, moss). Each card and case-study page scopes its palette while preserving readable typography. Add a theme to the typed union and palette table if needed; test text/link contrast.
+4. Put approved media under `public/projects/<slug>/`. Provide `src`, actual dimensions, alt text and captions explaining context/your contribution. Metrics are optional; each needs baseline/timeframe/source context.
+5. Complete the five conversational chapters; set `published` and `featured` only after review. Project metadata and next-project navigation are automatic. Incomplete published records fail validation, unknown slugs return 404. Validation verifies structure, not factual truth or image rights.
+6. Add/update tests and review the new preview before merge.
+
+Personal copy/optional portrait live in `data/about.ts`; expertise in `data/expertise.ts`; verified email/LinkedIn/resume values in `data/site.ts`. Do not turn empty contact values into broken links.
+
+`/preview/case-study` contains prominently labeled writing prompts, not a real case study. It is publicly reachable and noindex, not an access-controlled draft system. Remove it before launch. Production sitemap, canonical URLs, social image, analytics and launch indexing remain later work; current prototype metadata deliberately stays noindex.

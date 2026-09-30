@@ -1,0 +1,121 @@
+name: Portfolio CI
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: portfolio-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - name: ESLint (warnings fail)
+        run: npm run lint
+      - name: TypeScript
+        run: npm run typecheck
+      - name: Tests and enforced coverage
+        run: npm run test:coverage
+      - name: Audit all dependencies (moderate and above fail)
+        run: npm run audit
+      - name: Production build
+        run: npm run build
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 14
+      - name: Upload production build for browser testing
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-build
+          path: |
+            .next/
+            !.next/cache/
+          include-hidden-files: true
+          retention-days: 1
+  browsers:
+    name: Browser / ${{ matrix.project }}
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [chromium, firefox, webkit, iphone, android, tablet]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          name: production-build
+          path: .next/
+      - run: npx playwright install --with-deps chromium firefox webkit
+      - run: npm run test:e2e -- --project=${{ matrix.project }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-${{ matrix.project }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+  performance:
+    name: Lighthouse
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          name: production-build
+          path: .next/
+      - run: npx playwright install --with-deps chromium
+      - run: npm run perf
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-reports
+          path: lighthouse-results/
+          retention-days: 14
+  gate:
+    name: Merge gate
+    if: always()
+    needs: [validate, browsers, performance]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every CI stage to succeed
+        env:
+          VALIDATE: ${{ needs.validate.result }}
+          BROWSERS: ${{ needs.browsers.result }}
+          PERFORMANCE: ${{ needs.performance.result }}
+        run: |
+          test "$VALIDATE" = success
+          test "$BROWSERS" = success
+          test "$PERFORMANCE" = success

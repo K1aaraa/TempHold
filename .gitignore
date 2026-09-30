@@ -4,3 +4,7 @@ node_modules/
 !.env.example
 .vercel/
 *.tsbuildinfo
+coverage/
+playwright-report/
+test-results/
+lighthouse-results/

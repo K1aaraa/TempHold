@@ -1,0 +1,6 @@
+export const expertise = [
+  { number: "01", title: "Product & Brand", question: "What makes this matter?", description: "Find the positioning, sharpen the message, and connect a product’s value to the people it’s for.", capabilities: ["Positioning", "Go-to-market", "Messaging", "Launches", "Brand strategy"] },
+  { number: "02", title: "Multicultural Marketing", question: "Who’s on the other side?", description: "Bring cultural context into the strategy from the beginning. Understand the audience beyond a translation or a demographic.", capabilities: ["Audience insights", "Cultural strategy", "Latino audiences", "Localization", "Storytelling"] },
+  { number: "03", title: "Community", question: "What makes people belong?", description: "Build programs and partnerships around shared value, with reasons for people to participate and keep showing up.", capabilities: ["Programs", "Partnerships", "Events", "Engagement", "Advocacy"] },
+  { number: "04", title: "Content & Digital", question: "How does the story travel?", description: "Turn a strategy into content and campaigns with a clear purpose, then learn from how people respond.", capabilities: ["Content strategy", "Social strategy", "Campaigns", "Growth experiments", "Digital marketing"] },
+] as const;

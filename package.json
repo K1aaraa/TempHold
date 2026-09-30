@@ -6,21 +6,41 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "audit": "npm audit --audit-level=moderate",
+    "perf": "node scripts/lighthouse.mjs",
+    "validate": "npm run lint && npm run typecheck && npm run test:coverage && npm run audit && npm run build",
+    "vercel-build": "npm run lint && npm run typecheck && npm run test:coverage && npm run audit && npm run build"
   },
   "dependencies": {
+    "gsap": "^3.14.0",
     "next": "16.3.8",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "gsap": "^3.14.0"
+    "react-dom": "^19.2.0"
   },
   "devDependencies": {
-    "typescript": "^5.9.0",
+    "@playwright/test": "^1.63.0",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.7",
     "@types/node": "^24.0.0",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "@vitest/coverage-v8": "^5.0.3",
     "eslint": "^9.0.0",
-    "eslint-config-next": "16.3.8"
+    "eslint-config-next": "16.3.8",
+    "jsdom": "^30.1.1",
+    "lighthouse": "^13.5.0",
+    "typescript": "^5.9.0",
+    "vitest": "^5.0.3"
+  },
+  "engines": {
+    "node": ">=24 <25"
   }
 }

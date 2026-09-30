@@ -1,3 +1,40 @@
 export function Hero() {
-  return <section id="top" className="hero" aria-labelledby="hero-title"><div className="hero-kicker"><span>MARKETING & COMMUNITY STRATEGIST</span><span className="edition">THE KIARA EDIT / VOL. 01</span></div><h1 id="hero-title"><span className="hero-line">Marketing</span><span className="hero-line second-line"><span className="con">con</span> <em lang="es">sazón.</em></span></h1><div className="hero-bottom"><p className="disciplines">Brand. Product.<br/><span>Cultura. Community.</span></p><p className="hero-intro">I’m Kiara, a multicultural marketer and community strategist building brands people actually want to be part of.</p><a className="scroll-link" href="#about"><span lang="es">Scroll pa’ abajo</span><span aria-hidden="true">↓</span></a></div><div className="hero-stamp" aria-hidden="true"><span>GOOD STRATEGY</span><b>✳</b><span>EXTRA SAZÓN</span></div></section>;
+  return (
+    <section id="top" className="hero" aria-labelledby="hero-title">
+      <div className="hero-kicker">
+        <span>MULTICULTURAL MARKETING & COMMUNITY STRATEGY</span>
+        <span className="edition">THE KIARA EDIT / VOL. 01</span>
+      </div>
+
+      <h1 id="hero-title">
+        <span className="hero-line">Marketing</span>
+        <span className="hero-line second-line">
+          <span className="con">con</span> <em lang="es">sazón.</em>
+        </span>
+      </h1>
+
+      <div className="hero-bottom">
+        <p className="disciplines">
+          Brand. Product.<br />
+          <span>Cultura. Community.</span>
+        </p>
+
+        <p className="hero-intro">
+          I’m Kiara — a first-gen Mexican-American marketer turning products,
+          brands, and communities into stories people actually want to be part of.
+        </p>
+
+        <a className="scroll-link" href="#about">
+          <span lang="es">Pásale ↓</span>
+          <span aria-hidden="true">↓</span>
+        </a>
+      </div>
+
+      <div className="hero-stamp" aria-hidden="true">
+        <span>CLARITY FIRST</span>
+        <b>✳</b>
+        <span>THEN ADD SAZÓN</span>
+      </div>
+    </section>
+  );
 }

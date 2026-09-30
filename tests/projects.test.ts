@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import test from "node:test";
+import { test } from "vitest";
 import { publishedProjects, findPublishedProject } from "../lib/projects.ts";
 import { projectTemplate } from "../content/project-template.ts";
 import { projectThemes } from "../data/themes.ts";

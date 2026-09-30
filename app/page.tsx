@@ -1,6 +1,10 @@
 import { Navigation } from "@/components/layout/Navigation";
 import { Hero } from "@/components/hero/Hero";
+import { About } from "@/components/about/About";
+import { Expertise } from "@/components/expertise/Expertise";
+import { SelectedWork } from "@/components/work/SelectedWork";
 import { StoryPrototype } from "@/components/motion/StoryPrototype";
+
 export default function Home() {
-  return <><Navigation/><main id="main"><Hero/><section id="about" className="about"><p className="eyebrow">A LITTLE INTRODUCTION</p><div><h2 lang="es">Hola, soy Kiara.</h2><p className="about-positioning">Multicultural marketer.<br/>Community builder.<br/><em>People person, always.</em></p></div><p className="about-copy">Storytelling has always been more than content; it’s connection. I bring cultural perspective, strategic thinking, and a community-first approach to the brands I help build.</p><span className="about-note" lang="es">con intención ↗</span></section><StoryPrototype/><section className="review"><p className="eyebrow">A FIRST TASTE</p><h2>More story.<br/><em>Coming next.</em></h2><p>This is the opening chapter. Selected work, real outcomes, and the people behind them belong in the next one.</p><a href="#top">Back to the beginning <span aria-hidden="true">↑</span></a></section></main><footer><a className="wordmark" href="#top">kiara<span aria-hidden="true">✳</span></a><p>Strategy with perspective. Marketing con sazón.</p><span>PORTFOLIO / IN PROGRESS</span></footer></>;
+  return <><Navigation /><main id="main"><Hero /><About /><Expertise /><SelectedWork /><StoryPrototype /></main><footer><a className="wordmark" href="#top">kiara<span aria-hidden="true">✳</span></a><p>Strategy with perspective. Marketing con sazón.</p><span>PORTFOLIO / IN PROGRESS</span></footer></>;
 }
